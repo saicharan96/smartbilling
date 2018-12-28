@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" id="html">
+<head>
+  <title>Admin Panel</title>
+  <meta charset="utf-8">
+    
+  <link rel="stylesheet" href="./css/bootstrap.css">
+  <link rel="stylesheet" href="./css/fonts.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" id="brandname" href="#"> Sakthi Masala Limited</a>
+    </div>
+    <div class="collapse navbar-collapse " id="myNavbar">
+      <div class="nav navbar-nav padleft">
+       <div class="row">
+<div class="col-md-12">
+  </div>
+       </div>
+    </div>
+       
+      <ul class="nav navbar-nav navbar-right navextra" >
+            <li><a onclick="openFullscreen();"  data-toggle="tooltip" data-placement="bottom" title="Full Screen" href="#"><span class="fa fa-expand"></span> Full Screen</a></li>
+     <li><a data-toggle="tooltip" data-placement="bottom" title="Notification" href="#"><span class="fa fa-bell"></span> Notification</a></li>
+        <li><a data-toggle="tooltip" data-placement="bottom" title="Logout" href="#"><span class="fa fa-power-off"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+   <div class="sidenav">
+        <a href="dash.html"><img class="icon" src="images/home.png"></a>
+       <a href="admin.html"><img class="icon" src="images/receipt.png"></a>
+          <a href="inventory.html"><img class="icon" src="images/inventory.png"></a>
+        <a href="agency.html"><img class="icon" src="images/company.png"></a>
+        <a href="sale.html"><img class="icon" src="images/shopping-bag.png"></a>
+        <a href="analytics.html"><img class="icon" src="images/analytics.png"></a>
+             <a href="user.html"><img class="icon" src="images/networking.png"></a>
+            <a href="combo.html"><img class="icon" src="images/sale.png"></a>
+        <a href="settings.html"><img class="icon" src="images/settings%20(1).png"></a>
+      </div>
+    <section class="remaining container1" >
+      <div id="preloader">
+  <div id="status">&nbsp;</div>
+        </div>
+    <h3 class="header">Inventory Panel</h3><p>Data Last Updated on: 22:30</p><hr>
+          <div class="row">
+             <div class="col-md-8">
+         <div id="my_div">
+                    <div class="row">
+                            <div class="col-xs-8">
+                  <input type="text" id="myInput" class="form-control searchbar" onkeyup="myFunction()" placeholder="Search for Products.." style="width:80%;margin-bottom:10px;" >
+                </div><div class="col-xs-4">Displaying 281 Products</div> </div>
+                    <table >
+                      <thead class="header">
+                        <th style="width:10%;">Item Id</th>
+                        <th style="width:15%;">Product Name</th>
+                        <th style="width:25%;">Description</th>
+                        <th style="width:10%;">Receiving</th>
+                        <th style="width:15%;">Quantity</th>
+                        <th style="width:15%;">Price</th>
+                        <th style="width:10%;">Action</th>
+                      </thead>
+                      <tbody id="myTable" class="table-user-information">
+                  
+                           <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                                 <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                               <tr>
+                            <td>12456</td>
+                          <td><input typ="text" class="text" value="Moom dhal"></td>
+                          <td><input typ="text" class="text" value="moom dhal 500gm packet"></td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td>30</td>
+                          <td><input typ="text" class="text" value="₹40"></td>
+                          <td><button class="btn btn-default">Update</button></td>
+                        </tr>
+                    
+                          </tbody>      </table>
+                 </div></div>
+            
+            
+            
+            <div class="col-md-4">
+                <div class="card top">
+             <h4 class="head">Add Stock to Inventory</h4>
+               <ul class="nav nav-tabs" role="tablist">
+                     <li role="presentation" class="active"><a href="#new" aria-controls="home" role="tab" data-toggle="tab">New Product</a></li>
+                     <li role="presentation"><a href="#old" aria-controls="profile" role="tab" data-toggle="tab">Old Product</a></li>   
+                                    </ul>
+                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="new"> <form action="/action_page.php">
+    <div class="form-group">
+      <label for="name">Product Name:</label>
+      <input type="name" class="form-control" placeholder="Enter Product Name" name="name">
+    </div>
+    <div class="form-group">
+      <label for="des">Product Description:</label>
+      <input type="name" class="form-control" placeholder="Enter Product Description" name="desc">
+    </div>
+     <div class="row">
+         <div class="col-xs-6">
+     <div class="form-group">
+      <label for="des">Receiving Cost:</label>
+      <input type="name" class="form-control" value="₹" name="recost">
+    </div></div>
+          <div class="col-xs-6">
+     <div class="form-group">
+      <label for="des">Quantity:</label>
+      <input type="name" class="form-control" placeholder="Enter Total Quantity" name="recost">
+    </div></div>
+         
+         </div>
+    <button type="submit" class="btn btn-success">Load Stock</button>
+  </form></div>
+                        
+                        
+                  <div role="tabpanel" class="tab-pane" id="old">
+                     <form action="/action_page.php">
+    <div class="form-group">
+      <label for="name">Product Name:</label>
+      <input type="name" class="form-control" placeholder="Enter Product Name" name="name">
+    </div>
+     <div class="row">
+         <div class="col-xs-6">
+     <div class="form-group">
+      <label for="des">Receiving Cost:</label>
+      <input type="name" class="form-control" value="₹" name="recost">
+    </div></div>
+          <div class="col-xs-6">
+     <div class="form-group">
+      <label for="des">Quantity:</label>
+      <input type="name" class="form-control" placeholder="Enter Total Quantity" name="recost">
+    </div></div>
+         
+         </div>
+    <button type="submit" class="btn btn-success">Load Stock</button>
+  </form>   
+                        
+                        
+                        </div>
+                                       
+                                    </div>
+            </div></div>
+        </div>      
+    </section>
+    
+    <!-- scripts start here -->
+    
+ <script>$(window).on('load', function() { // makes sure the whole site is loaded 
+  $('#status').fadeOut(); // will first fade out the loading animation 
+  $('#preloader').delay(100).fadeOut('slow'); // will fade out the white DIV that covers the website. 
+  $('body').delay(500).css({'overflow':'visible'});
+})</script>
+    
+       <script>
+                        var elem = document.getElementById("html");
+                        function openFullscreen() {
+                          if (elem.requestFullscreen) {
+                            elem.requestFullscreen();
+                          } else if (elem.mozRequestFullScreen) { /* Firefox */
+                            elem.mozRequestFullScreen();
+                          } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                            elem.webkitRequestFullscreen();
+                          } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                            elem.msRequestFullscreen();
+                          }
+                        }
+                        </script>
+          <script>
+                            $(document).ready(function(){
+                              $("#myInput").on("keyup", function() {
+                                var value = $(this).val().toLowerCase();
+                                $("#myTable tr").filter(function() {
+                                  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                                });
+                              });
+                            });
+                            </script>
+    
+    
+    
+  <!--addbutton-->
+    <script>
+    $("#addit").click(function(){
+  var productId = $("#productId").val();
+  var productName = $("#productName").val();
+  var productQuantity = $("#productQuantity").val();
+  var data = {
+    'product_id': productId,
+    'product_name': productName,
+    'quantity': productQuantity
+  };
+
+  $.post("/cart/add", data, showDone);
+ });
+ 
+ var showDone = function() {
+  /* Make something happen here*/
+ }
+    
+    
+    </script>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();   
+});
+</script>
+    <script>
+
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();   
+        });
+        </script>
+    <script>(function ($) {
+  $('.spinner .btn:first-of-type').on('click', function() {
+    $('.spinner input').val( parseInt($('.spinner input').val(), 10) + 1);
+  });
+  $('.spinner .btn:last-of-type').on('click', function() {
+    $('.spinner input').val( parseInt($('.spinner input').val(), 10) - 1);
+  });
+})(jQuery);</script>
+    </body></html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" id="html">
+<head>
+  <title>Admin Panel</title>
+  <meta charset="utf-8">
+    
+  <link rel="stylesheet" href="./css/bootstrap.css">
+  <link rel="stylesheet" href="./css/fonts.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" id="brandname" href="#"> Sakthi Masala Limited</a>
+    </div>
+    <div class="collapse navbar-collapse " id="myNavbar">
+      <div class="nav navbar-nav padleft">
+       <div class="row">
+<div class="col-md-12">
+  </div>
+       </div>
+    </div>
+       
+      <ul class="nav navbar-nav navbar-right navextra" >
+            <li><a onclick="openFullscreen();"  data-toggle="tooltip" data-placement="bottom" title="Full Screen" href="#"><span class="fa fa-expand"></span> Full Screen</a></li>
+     <li><a data-toggle="tooltip" data-placement="bottom" title="Notification" href="#"><span class="fa fa-bell"></span> Notification</a></li>
+        <li><a data-toggle="tooltip" data-placement="bottom" title="Logout" href="#"><span class="fa fa-power-off"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+    <div class="sidenav">
+        <a href="dash.html"><img class="icon" src="images/home.png"></a>
+       <a href="admin.html"><img class="icon" src="images/receipt.png"></a>
+          <a href="inventory.html"><img class="icon" src="images/inventory.png"></a>
+        <a href="agency.html"><img class="icon" src="images/company.png"></a>
+        <a href="sale.html"><img class="icon" src="images/shopping-bag.png"></a>
+        <a href="analytics.html"><img class="icon" src="images/analytics.png"></a>
+             <a href="user.html"><img class="icon" src="images/networking.png"></a>
+            <a href="combo.html"><img class="icon" src="images/sale.png"></a>
+        <a href="settings.html"><img class="icon" src="images/settings%20(1).png"></a>
+      </div>
+    <section class="remaining container1" >
+      <div id="preloader">
+  <div id="status">&nbsp;</div>
+        </div>
+    <h3 class="header">Agency Panel</h3><p>Data Last Updated on: 22:30</p><hr>
+    <div class="row nametask">
+        <div class="col-md-2">
+  <input type="text" class="form-control" name="agency"  placeholder="Agency Name"></div>
+            <div class="col-md-2">
+  <input type="text" class="form-control"  name="contact" placeholder="Agency contact"></div>
+           <div class="col-md-2">
+  <input type="text" class="form-control"  name="contact" placeholder="Alternate contact"></div>
+             <div class="col-md-2">
+  <input type="text" class="form-control" name="mail" placeholder="Agency Email"></div>
+           <div class="col-md-2">
+  <input type="text" class="form-control"  name="products" placeholder="Products Supplying"></div>
+        <div class="col-md-2"><button class="btn btn-success">Add Agency</button></div>
+        </div>
+        
+        
+        
+        <div class="row">
+             <div class="col-md-10">
+         <div id="my_div">
+                    <div class="row">
+                            <div class="col-xs-8">
+                  <input type="text" id="myInput" class="form-control searchbar" onkeyup="myFunction()" placeholder="Search for Agencies.." style="width:80%;margin-bottom:10px;" >
+                </div><div class="col-xs-4">Displaying 281 Products</div> </div>
+                    <table >
+                      <thead class="header">
+                        <th style="width:10%;">Agency Id</th>
+                        <th style="width:15%;">Agency Name</th>
+                        <th style="width:15%;">Agency Contact</th>
+                        <th style="width:15%;">Agency Contact</th>
+                        <th style="width:15%;">Agency Email</th>
+                        <th style="width:25%;">Products Supplying</th>
+                         <th style="width:10%;">Status</th> 
+                        <th style="width:10%;">Action</th>
+                      </thead>
+                      <tbody id="myTable">
+                      <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+                            <tr>
+                            <td>78767</td>
+                          <td>abc Agency</td>
+                          <td>9867686768</td>
+                          <td>3546758950</td>
+                          <td>abc@gmail.com</td>
+                          <td>moom dhal, pistha, badham</td>
+                          <td>Active</td>
+                          <td><button data-toggle="modal" data-target="#myModal2" class="btn btn-info">Edit</button></td>
+                        </tr>
+
+                    
+                          </tbody>      </table>
+                 </div></div>
+            <div class="col-md-2" style="border-left:1px solid #f4f4f4;">
+                <h5>Agency Ranking</h5><hr>
+            <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br>
+                  <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br> 
+                 <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br>  
+                 <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br>  
+                 <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br>  
+                 <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br>  
+                 <small class="litpad">abc agency - 1</small><br>
+                <small class="litpad">xyz agency - 2</small><br>  
+ 
+            </div>
+        </div>      
+    </section>
+    
+    <!-- scripts start here -->
+    
+ <script>$(window).on('load', function() { // makes sure the whole site is loaded 
+  $('#status').fadeOut(); // will first fade out the loading animation 
+  $('#preloader').delay(100).fadeOut('slow'); // will fade out the white DIV that covers the website. 
+  $('body').delay(500).css({'overflow':'visible'});
+})</script>
+    
+       <script>
+                        var elem = document.getElementById("html");
+                        function openFullscreen() {
+                          if (elem.requestFullscreen) {
+                            elem.requestFullscreen();
+                          } else if (elem.mozRequestFullScreen) { /* Firefox */
+                            elem.mozRequestFullScreen();
+                          } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                            elem.webkitRequestFullscreen();
+                          } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                            elem.msRequestFullscreen();
+                          }
+                        }
+                        </script>
+          <script>
+                            $(document).ready(function(){
+                              $("#myInput").on("keyup", function() {
+                                var value = $(this).val().toLowerCase();
+                                $("#myTable tr").filter(function() {
+                                  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                                });
+                              });
+                            });
+                            </script>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();   
+});
+</script>
+    <script>
+
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();   
+        });
+        </script>
+    <script>(function ($) {
+  $('.spinner .btn:first-of-type').on('click', function() {
+    $('.spinner input').val( parseInt($('.spinner input').val(), 10) + 1);
+  });
+  $('.spinner .btn:last-of-type').on('click', function() {
+    $('.spinner input').val( parseInt($('.spinner input').val(), 10) - 1);
+  });
+})(jQuery);</script>
+    </body></html>
