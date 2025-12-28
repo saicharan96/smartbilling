@@ -1,74 +1,110 @@
 <template>
-  <div>
-    <h2>Dashboard</h2>
-    <p>Last Updated: {{ lastUpdated }}</p>
-    <hr style="margin: 15px 0;">
-
-    <div class="stats-grid">
-      <div class="stat-card color1">
-        <h4>Today's Sales</h4>
-        <h2>{{ formatCurrency(todaySales) }}</h2>
-        <small>{{ todaySalesCount }} invoices</small>
-      </div>
-      <div class="stat-card color2">
-        <h4>Total Products</h4>
-        <h2>{{ totalProducts }}</h2>
-        <small>in inventory</small>
-      </div>
-      <div class="stat-card color3">
-        <h4>Total Customers</h4>
-        <h2>{{ totalCustomers }}</h2>
-        <small>registered</small>
-      </div>
-      <div class="stat-card color4">
-        <h4>Monthly Expenses</h4>
-        <h2>{{ formatCurrency(monthlyExpenses) }}</h2>
-        <small>this month</small>
-      </div>
+  <div class="w-full">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Dashboard</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Last Updated: {{ lastUpdated }}</p>
     </div>
 
-    <div class="grid-2">
-      <div class="card">
-        <h3>Recent Sales</h3>
-        <div v-if="recentSales.length === 0">Loading...</div>
-        <table v-else style="width: 100%;">
-          <thead>
-            <tr>
-              <th>Invoice</th>
-              <th>Customer</th>
-              <th>Amount</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="sale in recentSales" :key="sale.id">
-              <td>{{ sale.invoiceId || sale.id }}</td>
-              <td>{{ sale.customerName || 'N/A' }}</td>
-              <td>{{ formatCurrency(sale.total || 0) }}</td>
-              <td>{{ formatDate(sale.createdAt) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Stats Cards -->
+    <div class="mb-6">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-5">Overview</h3>
+      <dl class="dashboard-metrics grid grid-cols-1 divide-gray-200 dark:divide-gray-700 overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm md:grid-cols-4 md:divide-x md:divide-y-0">
+        <div class="px-4 py-5 sm:p-6">
+          <dt class="text-base font-normal text-gray-900 dark:text-gray-100">Today's Sales</dt>
+          <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+            <div class="flex items-baseline text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              {{ formatCurrency(todaySales) }}
+            </div>
+            <div class="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              {{ todaySalesCount }} invoices
+            </div>
+          </dd>
+        </div>
 
-      <div class="card">
-        <h3>Low Stock Items</h3>
-        <div v-if="lowStockItems.length === 0">No low stock items</div>
-        <table v-else style="width: 100%;">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Stock</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in lowStockItems" :key="item.id">
-              <td>{{ item.name || 'N/A' }}</td>
-              <td><span class="badge">{{ item.quantity || 0 }}</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="px-4 py-5 sm:p-6">
+          <dt class="text-base font-normal text-gray-900 dark:text-gray-100">Total Products</dt>
+          <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+            <div class="flex items-baseline text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              {{ totalProducts }}
+            </div>
+            <div class="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              in inventory
+            </div>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 sm:p-6">
+          <dt class="text-base font-normal text-gray-900 dark:text-gray-100">Total Customers</dt>
+          <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+            <div class="flex items-baseline text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              {{ totalCustomers }}
+            </div>
+            <div class="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              registered
+            </div>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 sm:p-6">
+          <dt class="text-base font-normal text-gray-900 dark:text-gray-100">Monthly Expenses</dt>
+          <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+            <div class="flex items-baseline text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              {{ formatCurrency(monthlyExpenses) }}
+            </div>
+            <div class="mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              this month
+            </div>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Recent Sales and Low Stock -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Recent Sales -->
+      <el-card shadow="never" class="bg-white dark:bg-gray-800">
+        <template #header>
+          <span class="text-lg font-semibold dark:text-gray-100">Recent Sales</span>
+        </template>
+        <el-table 
+          v-loading="salesStore.loading"
+          :data="recentSales" 
+          style="width: 100%"
+          :empty-text="'No recent sales'"
+        >
+          <el-table-column prop="invoiceId" label="Invoice" width="120" />
+          <el-table-column prop="customerName" label="Customer" />
+          <el-table-column prop="total" label="Amount" width="120">
+            <template #default="{ row }">
+              {{ formatCurrency(row.total || 0) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="createdAt" label="Date" width="120">
+            <template #default="{ row }">
+              {{ formatDate(row.createdAt) }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+
+      <!-- Low Stock Items -->
+      <el-card shadow="never" class="bg-white dark:bg-gray-800">
+        <template #header>
+          <span class="text-lg font-semibold dark:text-gray-100">Low Stock Items</span>
+        </template>
+        <el-table 
+          :data="lowStockItems" 
+          style="width: 100%"
+          :empty-text="'No low stock items'"
+        >
+          <el-table-column prop="name" label="Product" />
+          <el-table-column prop="quantity" label="Stock" width="100">
+            <template #default="{ row }">
+              <el-tag type="warning">{{ row.quantity || 0 }}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
     </div>
   </div>
 </template>
@@ -78,102 +114,31 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { $firebase } = useNuxtApp()
+const productsStore = useProductsStore()
+const customersStore = useCustomersStore()
+const salesStore = useSalesStore()
+const expensesStore = useExpensesStore()
 
-const todaySales = ref(0)
-const todaySalesCount = ref(0)
-const totalProducts = ref(0)
-const totalCustomers = ref(0)
-const monthlyExpenses = ref(0)
-const recentSales = ref<any[]>([])
-const lowStockItems = ref<any[]>([])
+const todaySales = computed(() => salesStore.todayTotal)
+const todaySalesCount = computed(() => salesStore.todayCount)
+const totalProducts = computed(() => productsStore.totalProducts)
+const totalCustomers = computed(() => customersStore.totalCustomers)
+const monthlyExpenses = computed(() => expensesStore.monthlyExpenses)
+const recentSales = computed(() => salesStore.sales.slice(0, 5))
+const lowStockItems = computed(() => productsStore.lowStockProducts)
+
 const lastUpdated = ref('')
-
-const formatCurrency = (amount: number) => {
-  return '₹' + parseFloat(amount.toString()).toFixed(2)
-}
-
-const formatDate = (date: any) => {
-  if (!date) return ''
-  const d = date.toDate ? date.toDate() : new Date(date)
-  return d.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}
 
 const loadDashboard = async () => {
   try {
-    const { collection, query, where, orderBy, limit, getDocs, Timestamp } = await import('firebase/firestore')
+    await Promise.all([
+      productsStore.fetchProducts(),
+      customersStore.fetchCustomers(),
+      salesStore.fetchSales(5),
+      salesStore.fetchTodaySales(),
+      expensesStore.fetchExpenses()
+    ])
     
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayEnd = new Date(today)
-    todayEnd.setHours(23, 59, 59, 999)
-
-    // Today's sales
-    const salesQuery = query(
-      collection($firebase.db, 'invoices'),
-      where('createdAt', '>=', Timestamp.fromDate(today)),
-      where('createdAt', '<=', Timestamp.fromDate(todayEnd))
-    )
-    const salesSnapshot = await getDocs(salesQuery)
-    
-    let todayTotal = 0
-    salesSnapshot.forEach((doc: any) => {
-      const data = doc.data()
-      todayTotal += data.total || 0
-    })
-    todaySales.value = todayTotal
-    todaySalesCount.value = salesSnapshot.size
-
-    // Total products
-    const productsSnapshot = await getDocs(collection($firebase.db, 'products'))
-    totalProducts.value = productsSnapshot.size
-
-    // Total customers
-    const customersSnapshot = await getDocs(collection($firebase.db, 'customers'))
-    totalCustomers.value = customersSnapshot.size
-
-    // Monthly expenses
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
-    const expensesQuery = query(
-      collection($firebase.db, 'expenses'),
-      where('date', '>=', Timestamp.fromDate(monthStart))
-    )
-    const expensesSnapshot = await getDocs(expensesQuery)
-    
-    let monthlyTotal = 0
-    expensesSnapshot.forEach((doc: any) => {
-      monthlyTotal += doc.data().amount || 0
-    })
-    monthlyExpenses.value = monthlyTotal
-
-    // Recent sales
-    const recentQuery = query(
-      collection($firebase.db, 'invoices'),
-      orderBy('createdAt', 'desc'),
-      limit(5)
-    )
-    const recentSnapshot = await getDocs(recentQuery)
-    recentSales.value = recentSnapshot.docs.map((doc: any) => ({
-      id: doc.id,
-      ...doc.data()
-    }))
-
-    // Low stock items
-    const lowStockQuery = query(
-      collection($firebase.db, 'products'),
-      where('quantity', '<=', 10),
-      limit(10)
-    )
-    const lowStockSnapshot = await getDocs(lowStockQuery)
-    lowStockItems.value = lowStockSnapshot.docs.map((doc: any) => ({
-      id: doc.id,
-      ...doc.data()
-    }))
-
     lastUpdated.value = new Date().toLocaleString()
   } catch (error) {
     console.error('Error loading dashboard:', error)
@@ -182,99 +147,76 @@ const loadDashboard = async () => {
 
 onMounted(() => {
   loadDashboard()
-  setInterval(loadDashboard, 30000) // Refresh every 30 seconds
 })
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount || 0)
+}
+
+const formatDate = (date: any) => {
+  if (!date) return 'N/A'
+  const d = date.toDate ? date.toDate() : new Date(date)
+  return d.toLocaleDateString('en-IN')
+}
 </script>
 
 <style scoped>
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
+/* Force white background for metric cards in light mode */
+.dashboard-metrics {
+  background-color: white !important;
 }
 
-.stat-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.dark .dashboard-metrics {
+  background-color: #1e293b !important;
 }
 
-.stat-card h4 {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
+.dashboard-metrics > div {
+  background-color: white !important;
 }
 
-.stat-card h2 {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 10px 0;
+.dark .dashboard-metrics > div {
+  background-color: #1e293b !important;
 }
 
-.stat-card small {
-  color: #999;
-  font-size: 12px;
+/* Force dark text in light mode for metric cards */
+.dashboard-metrics dt,
+.dashboard-metrics dd,
+.dashboard-metrics > div > dt,
+.dashboard-metrics > div > dd,
+.dashboard-metrics > div > dd > div {
+  color: #111827 !important;
 }
 
-.color1 { background: #bcffd0; }
-.color2 { background: #c4c5ff; }
-.color3 { background: #fdccbd; }
-.color4 { background: #b2d0fb; }
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+.dark .dashboard-metrics dt,
+.dark .dashboard-metrics dd,
+.dark .dashboard-metrics > div > dt,
+.dark .dashboard-metrics > div > dd,
+.dark .dashboard-metrics > div > dd > div {
+  color: #f1f5f9 !important;
 }
 
-.card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Specific text size classes */
+.dashboard-metrics .text-2xl {
+  color: #111827 !important;
 }
 
-.card h3 {
-  margin-bottom: 15px;
-  font-size: 18px;
+.dark .dashboard-metrics .text-2xl {
+  color: #f1f5f9 !important;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.dashboard-metrics .text-base {
+  color: #111827 !important;
 }
 
-table th,
-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
+.dark .dashboard-metrics .text-base {
+  color: #f1f5f9 !important;
 }
 
-table th {
-  background: #f5f5f5;
-  font-weight: 600;
-  font-size: 13px;
+.dashboard-metrics .text-sm.text-gray-500 {
+  color: #6b7280 !important;
 }
 
-.badge {
-  background: #ffc107;
-  color: #333;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
+.dark .dashboard-metrics .text-sm.text-gray-500 {
+  color: #94a3b8 !important;
 }
 </style>
-

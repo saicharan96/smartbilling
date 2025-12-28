@@ -63,11 +63,14 @@ Go to Firestore Database > Rules and paste the following:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can only access their own data
+    // Users collection - users can read/write their own profile
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow creating user document during registration
+      allow create: if request.auth != null && request.auth.uid == userId;
     }
     
+    // Products collection - users can only access their own products
     match /products/{productId} {
       allow read, write: if request.auth != null && 
         resource.data.userId == request.auth.uid;
@@ -75,6 +78,7 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid;
     }
     
+    // Customers collection - users can only access their own customers
     match /customers/{customerId} {
       allow read, write: if request.auth != null && 
         resource.data.userId == request.auth.uid;
@@ -82,14 +86,24 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid;
     }
     
-    match /invoices/{invoiceId} {
+    // Sales collection - users can only access their own sales
+    match /sales/{saleId} {
       allow read, write: if request.auth != null && 
         resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && 
         request.resource.data.userId == request.auth.uid;
     }
     
+    // Expenses collection - users can only access their own expenses
     match /expenses/{expenseId} {
+      allow read, write: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Invoices collection (if used separately from sales)
+    match /invoices/{invoiceId} {
       allow read, write: if request.auth != null && 
         resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && 

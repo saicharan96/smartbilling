@@ -1,13 +1,400 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Color Variables */
+:root {
+  --base-color: #001f2a;
+  --base-color-dark: #001118;
+  --base-color-light: #003d4f;
+  --font-primary: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-secondary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f5f5;
+  font-family: var(--font-secondary);
+  background: #f5f5f5 !important;
   color: #333;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background: #0f172a !important;
+  color: #f1f5f9;
+}
+
+html {
+  background: #f5f5f5 !important;
+  transition: background-color 0.3s ease;
+}
+
+.dark html {
+  background: #0f172a !important;
+}
+
+/* Remove ALL decorative patterns and backgrounds */
+* {
+  background-image: none !important;
+}
+
+html, body {
+  background: #f5f5f5 !important;
+  background-image: none !important;
+}
+
+main, .main-content, .el-main {
+  background: #f5f5f5 !important;
+  background-image: none !important;
+  transition: background-color 0.3s ease;
+}
+
+.dark main, .dark .main-content, .dark .el-main {
+  background: #0f172a !important;
+}
+
+.el-card {
+  background: white !important;
+  background-image: none !important;
+  border-color: #e5e7eb !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .el-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Dashboard metric cards - force white in light mode */
+.dashboard-metrics {
+  background-color: white !important;
+  border-color: #e5e7eb !important;
+}
+
+.dark .dashboard-metrics {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dashboard-metrics > div {
+  background-color: white !important;
+  border-color: #e5e7eb !important;
+}
+
+.dark .dashboard-metrics > div {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Force dark text in light mode for metric cards */
+.dashboard-metrics dt,
+.dashboard-metrics dd,
+.dashboard-metrics > div > dt,
+.dashboard-metrics > div > dd,
+.dashboard-metrics > div > dd > div {
+  color: #111827 !important;
+}
+
+.dark .dashboard-metrics dt,
+.dark .dashboard-metrics dd,
+.dark .dashboard-metrics > div > dt,
+.dark .dashboard-metrics > div > dd,
+.dark .dashboard-metrics > div > dd > div {
+  color: #f1f5f9 !important;
+}
+
+/* Specific text size classes */
+.dashboard-metrics .text-2xl {
+  color: #111827 !important;
+}
+
+.dark .dashboard-metrics .text-2xl {
+  color: #f1f5f9 !important;
+}
+
+.dashboard-metrics .text-base {
+  color: #111827 !important;
+}
+
+.dark .dashboard-metrics .text-base {
+  color: #f1f5f9 !important;
+}
+
+.dashboard-metrics .text-sm.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.dark .dashboard-metrics .text-sm.text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+.el-card__body {
+  background: white !important;
+  background-image: none !important;
+  transition: background-color 0.3s ease;
+}
+
+.dark .el-card__body {
+  background: #1e293b !important;
+  color: #f1f5f9;
+}
+
+/* Tables - light and dark mode */
+.el-table {
+  border-color: #e5e7eb !important;
+}
+
+.el-table th {
+  border-color: #e5e7eb !important;
+}
+
+.el-table td {
+  border-color: #e5e7eb !important;
+}
+
+.dark .el-table {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+.dark .el-table th {
+  background-color: #0f172a !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+}
+
+.dark .el-table td {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+.dark .el-table tr {
+  background-color: #1e293b !important;
+}
+
+.dark .el-table--striped .el-table__body tr.el-table__row--striped td {
+  background-color: #0f172a !important;
+}
+
+.dark .el-table--striped .el-table__body tr.el-table__row--striped:hover td {
+  background-color: #334155 !important;
+}
+
+.dark .el-table tbody tr:hover > td {
+  background-color: #334155 !important;
+}
+
+.dark .el-table__empty-block {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+.dark .el-table__empty-text {
+  color: #94a3b8 !important;
+}
+
+.dark .el-table__body-wrapper,
+.dark .el-table__header-wrapper {
+  background-color: #1e293b !important;
+}
+
+.dark .el-table__header {
+  background-color: #0f172a !important;
+}
+
+.dark .el-table__body {
+  background-color: #1e293b !important;
+}
+
+.dark .el-table__row {
+  background-color: #1e293b !important;
+}
+
+.dark .el-table__row:hover {
+  background-color: #334155 !important;
+}
+
+.dark .el-table__row:hover td {
+  background-color: #334155 !important;
+}
+
+.el-table .el-table__cell {
+  border-color: #e5e7eb !important;
+}
+
+.dark .el-table .el-table__cell {
+  background-color: inherit !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+.el-table thead .el-table__cell {
+  border-color: #e5e7eb !important;
+}
+
+.dark .el-table thead .el-table__cell {
+  background-color: #0f172a !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+}
+
+.el-table tbody .el-table__cell {
+  border-color: #e5e7eb !important;
+}
+
+.dark .el-table tbody .el-table__cell {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+.dark .el-table tbody tr:hover .el-table__cell {
+  background-color: #334155 !important;
+}
+
+/* Dark mode for all text - more specific selectors */
+.dark p,
+.dark span:not(.el-badge__content),
+.dark div:not(.el-loading-mask):not(.el-loading-spinner),
+.dark label,
+.dark td,
+.dark th,
+.dark .el-table__cell,
+.dark .el-table__cell * {
+  color: #f1f5f9 !important;
+}
+
+.dark .el-table .cell {
+  color: #f1f5f9 !important;
+}
+
+.dark .el-table th .cell {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-800,
+.dark .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for inputs and selects */
+.dark .el-input__inner,
+.dark .el-textarea__inner,
+.dark .el-select .el-input__inner {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .el-input__inner::placeholder,
+.dark .el-textarea__inner::placeholder {
+  color: #64748b !important;
+}
+
+.dark .el-input__inner:focus,
+.dark .el-textarea__inner:focus {
+  border-color: #3b82f6 !important;
+}
+
+/* Dark mode for buttons */
+.dark .el-button--default {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .el-button--default:hover {
+  background-color: #334155 !important;
+  border-color: #64748b !important;
+}
+
+.dark .el-button--text {
+  color: #cbd5e1 !important;
+}
+
+.dark .el-button--text:hover {
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for dropdowns */
+.dark .el-dropdown-menu {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark .el-dropdown-menu__item {
+  color: #f1f5f9 !important;
+}
+
+.dark .el-dropdown-menu__item:hover {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode for form labels */
+.dark .el-form-item__label {
+  color: #cbd5e1 !important;
+}
+
+/* Card headers - light and dark mode */
+.el-card__header {
+  border-bottom-color: #e5e7eb !important;
+}
+
+.dark .el-card__header {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-bottom-color: #334155 !important;
+}
+
+/* Dark mode for dividers */
+.dark .el-divider {
+  border-color: #334155 !important;
+}
+
+.dark .el-divider__text {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+/* Primary Font (Sora) - for headings, titles, buttons */
+h1, h2, h3, h4, h5, h6,
+.login-header h1,
+.modal-title,
+.btn-primary,
+.navbar h2 {
+  font-family: var(--font-primary);
+  transition: color 0.3s ease;
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: #f1f5f9;
+}
+
+/* Secondary Font (Inter) - for body text, labels, inputs */
+body,
+input,
+label,
+.form-group label,
+.signup-text,
+.alert {
+  font-family: var(--font-secondary);
 }
 
 /* Login Styles */
@@ -16,7 +403,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--base-color) 0%, var(--base-color-dark) 100%);
   padding: 20px;
 }
 
@@ -30,7 +417,7 @@ body {
 }
 
 .login-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--base-color) 0%, var(--base-color-dark) 100%);
   color: white;
   padding: 35px 30px;
   text-align: center;
@@ -40,6 +427,7 @@ body {
   font-size: 26px;
   font-weight: 600;
   margin-bottom: 5px;
+  font-family: var(--font-primary);
 }
 
 .login-header p {
@@ -87,7 +475,7 @@ body {
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--base-color);
 }
 
 .options {
@@ -106,7 +494,7 @@ body {
 }
 
 .forgot-link {
-  color: #667eea;
+  color: var(--base-color);
   text-decoration: none;
   font-weight: 500;
 }
@@ -118,7 +506,7 @@ body {
 .btn-primary {
   width: 100%;
   padding: 13px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--base-color) 0%, var(--base-color-dark) 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -130,7 +518,7 @@ body {
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(0, 31, 42, 0.4);
 }
 
 .btn-primary:disabled {
@@ -172,7 +560,7 @@ body {
 }
 
 .signup-text a {
-  color: #667eea;
+  color: var(--base-color);
   text-decoration: none;
   font-weight: 600;
 }
@@ -203,8 +591,8 @@ body {
 
 /* Dashboard Styles */
 .navbar {
-  background: #21679e;
-  color: white;
+  background: white;
+  color: #333;
   padding: 15px 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -241,7 +629,6 @@ body {
 }
 
 .main-content {
-  margin-left: 60px;
   padding: 20px;
   min-height: calc(100vh - 60px);
 }
@@ -252,6 +639,23 @@ body {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Ensure all headings use Sora */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  font-weight: 600;
+}
+
+/* Buttons use Sora */
+button, .btn-primary, .btn {
+  font-family: var(--font-primary);
+}
+
+/* Stat cards headings */
+.stat-card h4,
+.stat-card h2 {
+  font-family: var(--font-primary);
 }
 
 /* Mobile Responsive */
@@ -275,7 +679,7 @@ body {
     top: 10px;
     left: 10px;
     z-index: 1001;
-    background: #21679e;
+    background: var(--base-color);
     color: white;
     border: none;
     padding: 10px 15px;

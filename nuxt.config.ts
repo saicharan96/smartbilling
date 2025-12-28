@@ -2,17 +2,24 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2024-01-01',
-  css: ['~/assets/css/main.css'],
+  modules: [
+    '@pinia/nuxt',
+    '@element-plus/nuxt',
+    '@nuxtjs/tailwindcss'
+  ],
+  css: [
+    '~/assets/css/main.css',
+    'element-plus/dist/index.css'
+  ],
   app: {
     head: {
-      title: 'Smart Billing System',
+      title: 'XendPoS',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' }
       ],
       link: [
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' },
-        { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' }
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap' }
       ]
     }
   },
