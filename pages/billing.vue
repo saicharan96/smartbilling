@@ -177,14 +177,13 @@
             :key="index"
             class="cart-item"
           >
-            <div class="cart-item-info">
-              <div class="cart-item-name">{{ item.name }}</div>
-              <div class="cart-item-price">{{ formatCurrency(item.price) }}</div>
-            </div>
-            <div class="cart-item-controls">
-              <button @click="decreaseQuantity(index)" class="qty-btn">-</button>
-              <span class="qty-value">{{ item.quantity }}</span>
-              <button @click="increaseQuantity(index)" class="qty-btn">+</button>
+            <div class="cart-item-name">{{ item.name }}</div>
+            <div class="cart-item-middle">
+              <div class="cart-item-controls">
+                <button @click="decreaseQuantity(index)" class="qty-btn">-</button>
+                <span class="qty-value">{{ item.quantity }}</span>
+                <button @click="increaseQuantity(index)" class="qty-btn">+</button>
+              </div>
               <button @click="removeFromCart(index)" class="remove-btn">
                 <TrashIcon class="w-4 h-4" />
               </button>
@@ -386,6 +385,7 @@ import { useCategoriesStore } from '~/stores/categories'
 import { useThemeStore } from '~/stores/theme'
 import { useAuthStore } from '~/stores/auth'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { ERROR_MESSAGES, getErrorMessage } from '~/constants/errors'
 
 definePageMeta({
   middleware: 'auth',
@@ -597,19 +597,31 @@ const addCustomerQuick = async () => {
 
 // Checkout
 const checkout = async () => {
+  // Validation
   if (cartItems.value.length === 0) {
-    ElMessage.warning('Cart is empty')
+    ElMessage.warning({
+      message: ERROR_MESSAGES.CART_EMPTY,
+      duration: 3000
+    })
     return
   }
   
   if (!selectedPaymentMethod.value) {
-    ElMessage.warning('Please select a payment method')
+    ElMessage.warning({
+      message: ERROR_MESSAGES.PAYMENT_METHOD_NOT_SELECTED,
+      duration: 3000
+    })
     return
   }
   
   checkoutLoading.value = true
   
   try {
+    // Ensure user profile is loaded
+    if (!authStore.userProfile) {
+      await authStore.loadUserProfile()
+    }
+    
     const customer = selectedCustomerData.value
     const invoiceId = salesStore.generateInvoiceId()
     const currentDate = new Date().toLocaleString('en-IN', {
@@ -620,11 +632,10 @@ const checkout = async () => {
       minute: '2-digit'
     })
     
-    const saleData = {
+    // Build sale data - only include defined values
+    const saleData: any = {
       invoiceId,
       customerName: customer?.name || 'Walk-in Customer',
-      customerContact: customer?.contact || undefined,
-      customerEmail: customer?.email || undefined,
       items: cartItems.value,
       subtotal: subtotal.value,
       taxPercent: taxPercent.value,
@@ -633,13 +644,22 @@ const checkout = async () => {
       paymentMethod: selectedPaymentMethod.value
     }
     
+    // Only add optional fields if they exist
+    if (customer?.contact) {
+      saleData.customerContact = customer.contact
+    }
+    if (customer?.email) {
+      saleData.customerEmail = customer.email
+    }
+    
     const result = await salesStore.createSale(saleData)
     
     if (!result.success) {
-      throw new Error(result.error || 'Failed to create sale')
+      const friendlyError = getErrorMessage(result.error || new Error(result.error))
+      throw new Error(friendlyError)
     }
     
-    // Store invoice data for print
+    // Store invoice data for print with business info
     lastInvoiceData.value = {
       ...saleData,
       date: currentDate
@@ -660,7 +680,16 @@ const checkout = async () => {
     showSuccessDialog.value = true
   } catch (error: any) {
     checkoutLoading.value = false
-    ElMessage.error(error.message || 'Failed to place order')
+    const friendlyError = getErrorMessage(error)
+    
+    // Show user-friendly error message
+    ElMessage.error({
+      message: friendlyError,
+      duration: 5000,
+      showClose: true
+    })
+    
+    console.error('Checkout error:', error)
   }
 }
 
@@ -699,6 +728,8 @@ const printInvoice = () => {
           .total-row { font-size: 14px; font-weight: bold; padding-top: 8px; border-top: 1px solid #000; margin-top: 8px; }
           .total-row .value { font-size: 16px; }
           .invoice-footer { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc; text-align: center; font-size: 10px; }
+          .footer-note { margin-top: 10px; font-style: italic; color: #666; }
+          .watermark { margin-top: 15px; font-size: 9px; color: #999; opacity: 0.6; font-weight: normal; text-transform: lowercase; letter-spacing: 1px; }
           @media print { @page { size: 80mm auto; margin: 0; } }
         </style>
       </head>
@@ -709,6 +740,11 @@ const printInvoice = () => {
   setTimeout(() => {
     printWindow.print()
   }, 250)
+}
+
+const closeSuccessDialog = () => {
+  showSuccessDialog.value = false
+  lastInvoiceData.value = null
 }
 
 const formatCurrency = (amount: number) => {
@@ -1424,53 +1460,55 @@ onMounted(() => {
 }
 
 .cart-item {
-  padding: 12px;
+  padding: 0 12px;
   background: #f9fafb;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  height: 40px;
+  max-height: 40px;
+  min-height: 40px;
 }
 
 .dark .cart-item {
   background: #0f172a;
 }
 
-.cart-item-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-}
-
 .cart-item-name {
   font-weight: 500;
   color: #111827;
   flex: 1;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .dark .cart-item-name {
   color: #f1f5f9;
 }
 
-.cart-item-price {
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.dark .cart-item-price {
-  color: #94a3b8;
+.cart-item-middle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .cart-item-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .qty-btn {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
   background: white;
@@ -1479,8 +1517,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
   transition: all 0.2s;
+  padding: 0;
 }
 
 .dark .qty-btn {
@@ -1495,10 +1535,11 @@ onMounted(() => {
 }
 
 .qty-value {
-  min-width: 30px;
+  min-width: 24px;
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   color: #111827;
+  font-size: 13px;
 }
 
 .dark .qty-value {
@@ -1515,6 +1556,9 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
 }
 
 .remove-btn:hover {
@@ -1523,8 +1567,11 @@ onMounted(() => {
 
 .cart-item-total {
   font-weight: 600;
-  color: #3b82f6;
+  color: #00ED64;
   text-align: right;
+  font-size: 13px;
+  flex-shrink: 0;
+  min-width: 70px;
 }
 
 .order-summary {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { collection, query, where, orderBy, limit, getDocs, doc, addDoc, updateDoc, Timestamp, serverTimestamp, increment } from 'firebase/firestore'
+import { getErrorMessage, ERROR_MESSAGES } from '~/constants/errors'
 
 export interface SaleItem {
   productId: string
@@ -141,12 +142,30 @@ export const useSalesStore = defineStore('sales', {
         const productsStore = useProductsStore()
         const customersStore = useCustomersStore()
 
-        // Create sale document
-        const docRef = await addDoc(collection($firebase.db, 'sales'), {
-          ...sale,
+        // Remove undefined values - Firestore doesn't allow undefined
+        const cleanSale: any = {
+          invoiceId: sale.invoiceId,
+          customerName: sale.customerName,
+          items: sale.items,
+          subtotal: sale.subtotal,
+          taxPercent: sale.taxPercent,
+          tax: sale.tax,
+          total: sale.total,
+          paymentMethod: sale.paymentMethod,
           userId: authStore.userId,
           createdAt: serverTimestamp()
-        })
+        }
+        
+        // Only include optional fields if they have values
+        if (sale.customerContact) {
+          cleanSale.customerContact = sale.customerContact
+        }
+        if (sale.customerEmail) {
+          cleanSale.customerEmail = sale.customerEmail
+        }
+
+        // Create sale document
+        const docRef = await addDoc(collection($firebase.db, 'sales'), cleanSale)
 
         // Update product quantities
         const batch = []
@@ -203,8 +222,10 @@ export const useSalesStore = defineStore('sales', {
         
         return { success: true, id: docRef.id }
       } catch (error: any) {
-        this.error = error.message
-        return { success: false, error: error.message }
+        const friendlyError = getErrorMessage(error)
+        this.error = friendlyError
+        console.error('Error creating sale:', error)
+        return { success: false, error: friendlyError }
       }
     },
 

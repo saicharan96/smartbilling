@@ -6,7 +6,7 @@
         <img :src="businessLogo" alt="Business Logo" class="business-logo-img" />
       </div>
       <div class="business-info">
-        <h1 class="business-name">{{ businessName || 'Business Name' }}</h1>
+        <h1 class="business-name">{{ businessName || '' }}</h1>
         <div v-if="businessAddress" class="business-address">{{ businessAddress }}</div>
         <div v-if="businessContact" class="business-contact">Phone: {{ businessContact }}</div>
       </div>
@@ -82,6 +82,7 @@
     <div class="invoice-footer">
       <p>Thank you for your business!</p>
       <p class="footer-note">This is a computer-generated invoice.</p>
+      <p class="watermark">powered by XendPoS</p>
     </div>
   </div>
 </template>
@@ -279,6 +280,16 @@ defineExpose({
   margin-top: 10px;
   font-style: italic;
   color: #666;
+}
+
+.watermark {
+  margin-top: 15px;
+  font-size: 9px;
+  color: #999;
+  opacity: 0.6;
+  font-weight: normal;
+  text-transform: lowercase;
+  letter-spacing: 1px;
 }
 
 /* Print Styles */

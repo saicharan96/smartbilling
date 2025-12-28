@@ -2,27 +2,21 @@ import { useProductsStore } from '~/stores/products'
 import { useCategoriesStore } from '~/stores/categories'
 import { useAuthStore } from '~/stores/auth'
 
-// Generate a simple base64 image (colored square)
+// Generate a simple base64 image (colored square) - using SVG data URI
 const generateBase64Image = (color: string = '#4F46E5'): string => {
-  // Create a 200x200 colored square as base64
-  const canvas = document.createElement('canvas')
-  canvas.width = 200
-  canvas.height = 200
-  const ctx = canvas.getContext('2d')
+  // Use SVG data URI which works everywhere
+  const svg = `<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" fill="${color}"/>
+    <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">PROD</text>
+  </svg>`
   
-  if (ctx) {
-    ctx.fillStyle = color
-    ctx.fillRect(0, 0, 200, 200)
-    
-    // Add some text in the center
-    ctx.fillStyle = '#FFFFFF'
-    ctx.font = 'bold 40px Arial'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('PROD', 100, 100)
+  // Encode SVG to base64
+  if (typeof window !== 'undefined' && window.btoa) {
+    return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)))
   }
   
-  return canvas.toDataURL('image/png')
+  // Fallback: use URL-encoded SVG (works without btoa)
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
 }
 
 // Sample product data
