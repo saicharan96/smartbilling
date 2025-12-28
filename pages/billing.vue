@@ -4,7 +4,8 @@
     <div class="top-bar">
       <!-- Customer Selection -->
       <div class="top-customer-section">
-        <div class="customer-selector">
+        <!-- Show select when no customer selected -->
+        <div v-if="!selectedCustomerData" class="customer-selector">
           <el-select
             :model-value="selectedCustomer"
             @update:model-value="selectedCustomer = $event"
@@ -33,14 +34,30 @@
             <PlusIcon class="w-4 h-4" />
           </button>
         </div>
-        <div v-if="selectedCustomerData" class="customer-info-top">
-          <div class="customer-detail">
-            <span v-if="selectedCustomerData.contact">{{ selectedCustomerData.contact }}</span>
-            <span v-if="selectedCustomerData.email">{{ selectedCustomerData.email }}</span>
+
+        <!-- Show customer details card when customer is selected -->
+        <div v-else class="customer-details-card">
+          <div class="customer-details-flex">
+            <span class="customer-detail-item customer-name-item">
+              <UserIcon class="w-4 h-4" />
+              <span class="customer-name-text">{{ selectedCustomerData.name }}</span>
+            </span>
+            <span v-if="selectedCustomerData.contact" class="customer-detail-item">
+              <DevicePhoneMobileIcon class="w-3.5 h-3.5" />
+              <span>{{ selectedCustomerData.contact }}</span>
+            </span>
+            <span v-if="selectedCustomerData.email" class="customer-detail-item">
+              <span class="meta-icon">@</span>
+              <span>{{ selectedCustomerData.email }}</span>
+            </span>
+            <span v-if="selectedCustomerData.address" class="customer-detail-item customer-address-item">
+              <BuildingLibraryIcon class="w-3.5 h-3.5" />
+              <span>{{ selectedCustomerData.address }}</span>
+            </span>
           </div>
-          <div v-if="selectedCustomerData.address" class="customer-address">
-            {{ selectedCustomerData.address }}
-          </div>
+          <button @click="selectedCustomer = null" class="customer-clear-btn" title="Clear customer">
+            <XMarkIcon class="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -227,11 +244,12 @@
         <div class="payment-methods">
           <button
             v-for="method in paymentMethods"
-            :key="method"
-            @click="selectedPaymentMethod = method"
-            :class="['payment-btn', { active: selectedPaymentMethod === method }]"
+            :key="method.name"
+            @click="selectedPaymentMethod = method.name"
+            :class="['payment-btn', 'shadow', { active: selectedPaymentMethod === method.name }]"
+            :title="method.name"
           >
-            {{ method }}
+            <component :is="method.icon" class="payment-icon" />
           </button>
         </div>
       </div>
@@ -276,6 +294,69 @@
         </el-form-item>
       </el-form>
     </el-drawer>
+
+    <!-- Loading Overlay -->
+    <div v-if="checkoutLoading" class="checkout-overlay">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p class="loading-text">Processing Order...</p>
+      </div>
+    </div>
+
+    <!-- Success Dialog -->
+    <el-dialog
+      v-model="showSuccessDialog"
+      title="Order Placed Successfully!"
+      width="500px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <div class="success-content">
+        <div class="success-icon">
+          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+        <p class="success-message">Your order has been placed successfully!</p>
+        <div v-if="lastInvoiceData" class="invoice-info">
+          <p><strong>Invoice #:</strong> {{ lastInvoiceData.invoiceId }}</p>
+          <p><strong>Total:</strong> {{ formatCurrency(lastInvoiceData.total) }}</p>
+        </div>
+      </div>
+      
+      <!-- Hidden Print Component -->
+      <div v-if="lastInvoiceData" class="hidden-print">
+        <InvoicePrint
+          ref="invoicePrintRef"
+          :invoice-id="lastInvoiceData.invoiceId"
+          :invoice-date="lastInvoiceData.date"
+          :business-logo="authStore.userProfile?.businessLogo"
+          :business-name="authStore.userProfile?.businessName"
+          :business-address="authStore.userProfile?.businessAddress"
+          :business-contact="authStore.userProfile?.businessContact"
+          :customer-name="lastInvoiceData.customerName"
+          :customer-contact="lastInvoiceData.customerContact"
+          :items="lastInvoiceData.items"
+          :subtotal="lastInvoiceData.subtotal"
+          :tax="lastInvoiceData.tax"
+          :tax-percent="lastInvoiceData.taxPercent"
+          :discount="lastInvoiceData.discount"
+          :total="lastInvoiceData.total"
+          :payment-method="lastInvoiceData.paymentMethod"
+        />
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="closeSuccessDialog">Close</el-button>
+          <el-button type="primary" @click="printInvoice">
+            <PrinterIcon class="w-4 h-4 mr-1" />
+            Print Invoice
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
     </div>
   </div>
 </template>
@@ -289,7 +370,13 @@ import {
   UserIcon,
   PlusIcon,
   ShoppingCartIcon,
-  ShoppingBagIcon
+  ShoppingBagIcon,
+  BanknotesIcon,
+  CreditCardIcon,
+  DevicePhoneMobileIcon,
+  BuildingLibraryIcon,
+  XMarkIcon,
+  PrinterIcon
 } from '@heroicons/vue/24/outline'
 import { PaperClipIcon as PinIcon } from '@heroicons/vue/24/solid'
 import { useProductsStore } from '~/stores/products'
@@ -297,10 +384,12 @@ import { useCustomersStore } from '~/stores/customers'
 import { useSalesStore } from '~/stores/sales'
 import { useCategoriesStore } from '~/stores/categories'
 import { useThemeStore } from '~/stores/theme'
+import { useAuthStore } from '~/stores/auth'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 definePageMeta({
-  middleware: 'auth'
+  middleware: 'auth',
+  layout: 'billing'
 })
 
 const productsStore = useProductsStore()
@@ -308,6 +397,7 @@ const customersStore = useCustomersStore()
 const salesStore = useSalesStore()
 const categoriesStore = useCategoriesStore()
 const themeStore = useThemeStore()
+const authStore = useAuthStore()
 
 // Search and filter
 const searchQuery = ref('')
@@ -344,12 +434,21 @@ const total = computed(() => {
 })
 
 // Payment
-const paymentMethods = ['Cash', 'Card', 'UPI', 'Bank Transfer']
+const paymentMethods = [
+  { name: 'Cash', icon: BanknotesIcon },
+  { name: 'Card', icon: CreditCardIcon },
+  { name: 'UPI', icon: DevicePhoneMobileIcon },
+  { name: 'Bank Transfer', icon: BuildingLibraryIcon }
+]
 const selectedPaymentMethod = ref<string | null>(null)
 
 // Customer drawer
 const showAddCustomer = ref(false)
 const addingCustomer = ref(false)
+const checkoutLoading = ref(false)
+const showSuccessDialog = ref(false)
+const lastInvoiceData = ref<any>(null)
+const invoicePrintRef = ref<any>(null)
 const newCustomer = ref({
   name: '',
   contact: '',
@@ -508,11 +607,21 @@ const checkout = async () => {
     return
   }
   
+  checkoutLoading.value = true
+  
   try {
     const customer = selectedCustomerData.value
+    const invoiceId = salesStore.generateInvoiceId()
+    const currentDate = new Date().toLocaleString('en-IN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
     
     const saleData = {
-      invoiceId: salesStore.generateInvoiceId(),
+      invoiceId,
       customerName: customer?.name || 'Walk-in Customer',
       customerContact: customer?.contact || undefined,
       customerEmail: customer?.email || undefined,
@@ -530,7 +639,11 @@ const checkout = async () => {
       throw new Error(result.error || 'Failed to create sale')
     }
     
-    ElMessage.success('Order placed successfully!')
+    // Store invoice data for print
+    lastInvoiceData.value = {
+      ...saleData,
+      date: currentDate
+    }
     
     // Clear cart
     cartItems.value = []
@@ -541,9 +654,61 @@ const checkout = async () => {
     
     // Refresh products to update stock
     await productsStore.fetchProducts()
+    
+    // Show success dialog
+    checkoutLoading.value = false
+    showSuccessDialog.value = true
   } catch (error: any) {
+    checkoutLoading.value = false
     ElMessage.error(error.message || 'Failed to place order')
   }
+}
+
+const printInvoice = () => {
+  if (!invoicePrintRef.value?.printContent) return
+  
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) return
+  
+  const printContent = invoicePrintRef.value.printContent.innerHTML
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Invoice - ${lastInvoiceData.value?.invoiceId || 'Invoice'}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Courier New', monospace; padding: 20px; }
+          .invoice-print { width: 80mm; max-width: 300px; margin: 0 auto; padding: 20px; background: white; color: #000; font-size: 12px; line-height: 1.4; }
+          .invoice-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; }
+          .business-logo-img { max-width: 80px; max-height: 80px; object-fit: contain; }
+          .business-name { font-size: 18px; font-weight: bold; margin: 10px 0 5px 0; text-transform: uppercase; }
+          .business-address, .business-contact { font-size: 11px; margin: 5px 0; line-height: 1.3; }
+          .invoice-details { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc; }
+          .invoice-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; }
+          .items-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px; }
+          .items-table thead { border-bottom: 1px solid #000; border-top: 1px solid #000; }
+          .items-table th { padding: 8px 4px; text-align: left; font-weight: bold; text-transform: uppercase; }
+          .items-table td { padding: 6px 4px; border-bottom: 1px dashed #ccc; }
+          .col-item { width: 40%; }
+          .col-qty { width: 15%; text-align: center; }
+          .col-price { width: 25%; text-align: right; }
+          .col-total { width: 20%; text-align: right; }
+          .invoice-summary { margin-top: 15px; padding-top: 10px; border-top: 2px dashed #000; }
+          .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+          .total-row { font-size: 14px; font-weight: bold; padding-top: 8px; border-top: 1px solid #000; margin-top: 8px; }
+          .total-row .value { font-size: 16px; }
+          .invoice-footer { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc; text-align: center; font-size: 10px; }
+          @media print { @page { size: 80mm auto; margin: 0; } }
+        </style>
+      </head>
+      <body>${printContent}</body>
+    </html>
+  `)
+  printWindow.document.close()
+  setTimeout(() => {
+    printWindow.print()
+  }, 250)
 }
 
 const formatCurrency = (amount: number) => {
@@ -620,10 +785,8 @@ onMounted(() => {
 .top-customer-section {
   min-width: 400px;
   max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
+
 
 .top-search-section {
   flex-shrink: 0;
@@ -656,14 +819,128 @@ onMounted(() => {
   min-width: 0;
 }
 
-.customer-info-top {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #e5e7eb;
+.customer-details-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  min-width: 0;
+  height: 40px;
 }
 
-.dark .customer-info-top {
-  border-top-color: #334155;
+.dark .customer-details-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.customer-details-flex {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.customer-details-flex::-webkit-scrollbar {
+  display: none;
+}
+
+.customer-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dark .customer-detail-item {
+  color: #94a3b8;
+}
+
+.customer-detail-item svg {
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.dark .customer-detail-item svg {
+  color: #94a3b8;
+}
+
+.customer-name-item {
+  font-weight: 600;
+  color: #111827;
+}
+
+.dark .customer-name-item {
+  color: #f1f5f9;
+}
+
+.customer-name-item svg {
+  color: #3b82f6;
+}
+
+.dark .customer-name-item svg {
+  color: #60a5fa;
+}
+
+.customer-name-text {
+  font-weight: 600;
+}
+
+.meta-icon {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.customer-address-item {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer-clear-btn {
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.customer-clear-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.dark .customer-clear-btn {
+  background: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+.dark .customer-clear-btn:hover {
+  background: #475569;
+  border-color: #64748b;
+  color: #f1f5f9;
 }
 
 /* Left Section */
@@ -726,6 +1003,7 @@ onMounted(() => {
   padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .dark .category-section {
@@ -764,9 +1042,9 @@ onMounted(() => {
 }
 
 .category-btn.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
+  background: #00ED64;
+  border-color: #00ED64;
+  color: #000000;
 }
 
 .products-grid {
@@ -774,17 +1052,21 @@ onMounted(() => {
   overflow-y: auto;
   padding: 16px;
   display: grid;
-  background-color: #f5f5f5;
-  border-left: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 16px;
+  background: white;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .products-grid {
+  background: #1e293b;
+  border-color: #334155;
 }
 
 .product-card {
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 24px;
   padding: 12px;
   transition: all 0.2s;
   display: flex;
@@ -802,8 +1084,8 @@ onMounted(() => {
 }
 
 .product-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #00ED64;
+  box-shadow: 0 4px 12px rgba(0, 237, 100, 0.15);
   transform: translateY(-2px);
 }
 
@@ -813,23 +1095,23 @@ onMounted(() => {
   right: 12px;
   width: 36px;
   height: 36px;
-  background: #3b82f6;
+  background: #00ED64;
   border: none;
   border-radius: 50%;
-  color: white;
+  color: #000000;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 237, 100, 0.4);
   z-index: 10;
 }
 
 .add-to-cart-btn:hover:not(:disabled) {
-  background: #2563eb;
+  background: #00c952;
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 237, 100, 0.6);
 }
 
 .add-to-cart-btn:active:not(:disabled) {
@@ -846,8 +1128,8 @@ onMounted(() => {
 .product-image {
   width: 100%;
   height: 140px;
-  background: #f3f4f6;
-  border-radius: 8px;
+  background: #F5F7FA;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -860,6 +1142,7 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 20px;
 }
 
 .dark .product-image {
@@ -965,7 +1248,7 @@ onMounted(() => {
 }
 
 .order-header {
-  padding: 16px;
+  padding: 4px 12px;
   background: white;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
@@ -1004,12 +1287,12 @@ onMounted(() => {
 }
 
 .action-btn {
-  padding: 8px 12px;
+  padding: 4px 8px;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: white;
   color: #374151;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1096,10 +1379,11 @@ onMounted(() => {
 }
 
 .cart-header {
-  padding: 12px 16px;
-  background: white;
+  padding: 4px 16px;
+  background: #f5f5f5;
   border-bottom: 1px solid #e5e7eb;
   font-weight: 500;
+  font-size: 12px;
   color: #111827;
 }
 
@@ -1261,6 +1545,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  font-size: 12px;
   color: #374151;
 }
 
@@ -1297,10 +1582,10 @@ onMounted(() => {
 }
 
 .total-row {
-  padding-top: 12px;
+  padding-top: 6px;
   border-top: 1px solid #e5e7eb;
-  margin-top: 12px;
-  font-size: 18px;
+  margin-top: 6px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -1335,21 +1620,29 @@ onMounted(() => {
 }
 
 .payment-methods {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   gap: 8px;
+  justify-content: space-between;
 }
 
 .payment-btn {
+  flex: 1;
   padding: 12px;
-  border: 2px solid #e5e7eb;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: white;
   color: #374151;
-  font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+}
+
+.payment-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .dark .payment-btn {
@@ -1358,14 +1651,21 @@ onMounted(() => {
   color: #cbd5e1;
 }
 
-.payment-btn:hover {
+.payment-btn:hover:not(.active) {
   border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.payment-btn:hover:not(.active) .payment-icon {
   color: #3b82f6;
 }
 
 .payment-btn.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: #00ED64;
+  border-color: #00ED64;
+}
+
+.payment-btn.active .payment-icon {
   color: white;
 }
 
@@ -1381,10 +1681,10 @@ onMounted(() => {
 .checkout-btn {
   width: 100%;
   padding: 16px;
-  background: #3b82f6;
+  background: #00ED64;
   border: none;
   border-radius: 8px;
-  color: white;
+  color: #000000;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1396,7 +1696,7 @@ onMounted(() => {
 }
 
 .checkout-btn:hover:not(:disabled) {
-  background: #2563eb;
+  background: #00c952;
 }
 
 .checkout-btn:disabled {
@@ -1435,5 +1735,166 @@ onMounted(() => {
     width: 100%;
     height: 50vh;
   }
+}
+
+/* Checkout Overlay */
+.checkout-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dark .loading-spinner {
+  background: #1e293b;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #00ED64;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.dark .spinner {
+  border-color: #334155;
+  border-top-color: #00ED64;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+  margin: 0;
+}
+
+.dark .loading-text {
+  color: #f1f5f9;
+}
+
+/* Success Dialog */
+.success-content {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  margin-bottom: 20px;
+}
+
+.checkmark {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #00ED64;
+  stroke-miterlimit: 10;
+  margin: 0 auto;
+  box-shadow: inset 0px 0px 0px #00ED64;
+  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #00ED64;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #00ED64;
+  }
+}
+
+.success-message {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 20px;
+}
+
+.dark .success-message {
+  color: #f1f5f9;
+}
+
+.invoice-info {
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.dark .invoice-info {
+  background: #334155;
+}
+
+.invoice-info p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #111827;
+}
+
+.dark .invoice-info p {
+  color: #f1f5f9;
+}
+
+.hidden-print {
+  display: none;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 </style>

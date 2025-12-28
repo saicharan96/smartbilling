@@ -2,56 +2,46 @@
   <div>
     <div class="page-header">
       <h2 class="page-title">Customers</h2>
-      <el-button type="danger" @click="openDrawer(null)">
+      <el-button type="primary" @click="openDrawer(null)">
         <PlusIcon class="w-4 h-4 mr-1" />
         Add Customer
       </el-button>
     </div>
 
-    <el-card shadow="never" class="bg-white rounded-lg">
-      <template #header>
-        <span class="text-lg font-semibold">Customer List</span>
+    <DataTable
+      :data="customersStore.customers"
+      :columns="tableColumns"
+      :loading="customersStore.loading"
+      search-placeholder="Search customers..."
+      empty-text="No customers yet. Add your first customer!"
+      :show-actions="true"
+      :show-index="true"
+      :page-size="20"
+    >
+      <template #totalAmount="{ row }">
+        {{ formatCurrency(row.totalAmount || 0) }}
       </template>
 
-      <el-table 
-        v-loading="customersStore.loading"
-        :data="customersStore.customers" 
-        style="width: 100%"
-        :empty-text="'No customers yet. Add your first customer!'"
-      >
-        <el-table-column prop="name" label="Name" />
-        <el-table-column prop="contact" label="Contact" />
-        <el-table-column prop="email" label="Email" />
-        <el-table-column prop="address" label="Address" show-overflow-tooltip />
-        <el-table-column prop="totalPurchases" label="Total Purchases" width="140" />
-        <el-table-column prop="totalAmount" label="Total Amount" width="140">
-          <template #default="{ row }">
-            {{ formatCurrency(row.totalAmount || 0) }}
+      <template #actions="{ row }">
+        <el-dropdown trigger="click" @command="handleCommand">
+          <el-button circle>
+            <el-icon><MoreFilled /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu class="w-56 divide-y divide-gray-100">
+              <el-dropdown-item :command="{ action: 'edit', row }" class="flex items-center px-4 py-2">
+                <PencilSquareIcon class="mr-3 h-5 w-5 text-gray-400" />
+                Edit
+              </el-dropdown-item>
+              <el-dropdown-item :command="{ action: 'delete', row }" divided class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50">
+                <TrashIcon class="mr-3 h-5 w-5 text-red-400" />
+                Delete
+              </el-dropdown-item>
+            </el-dropdown-menu>
           </template>
-        </el-table-column>
-        <el-table-column label="Actions" width="80">
-          <template #default="{ row }">
-            <el-dropdown trigger="click" @command="handleCommand">
-              <el-button circle>
-                <el-icon><MoreFilled /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu class="w-56 divide-y divide-gray-100">
-                  <el-dropdown-item :command="{ action: 'edit', row }" class="flex items-center px-4 py-2">
-                    <PencilSquareIcon class="mr-3 h-5 w-5 text-gray-400" />
-                    Edit
-                  </el-dropdown-item>
-                  <el-dropdown-item :command="{ action: 'delete', row }" divided class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50">
-                    <TrashIcon class="mr-3 h-5 w-5 text-red-400" />
-                    Delete
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+        </el-dropdown>
+      </template>
+    </DataTable>
 
     <!-- Customer Drawer -->
     <el-drawer
@@ -145,6 +135,15 @@ const drawerVisible = ref(false)
 const isEditing = ref(false)
 const saving = ref(false)
 const customerFormRef = ref<FormInstance>()
+
+const tableColumns = [
+  { prop: 'name', label: 'Name', minWidth: 150, sortable: true, filterable: true },
+  { prop: 'contact', label: 'Contact', width: 140, sortable: true, filterable: true },
+  { prop: 'email', label: 'Email', minWidth: 200, sortable: true, filterable: true },
+  { prop: 'address', label: 'Address', minWidth: 200, sortable: false },
+  { prop: 'totalPurchases', label: 'Total Purchases', width: 180, sortable: true },
+  { prop: 'totalAmount', label: 'Total Amount', width: 140, sortable: true }
+]
 
 const customerForm = ref({
   name: '',

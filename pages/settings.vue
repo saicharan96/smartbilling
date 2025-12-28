@@ -76,7 +76,7 @@
           <el-input v-model="businessContact" placeholder="Enter contact number" />
         </el-form-item>
         <el-form-item>
-          <el-button type="danger" @click="updateBusinessInfo" :loading="saving">Save Changes</el-button>
+          <el-button type="primary" @click="updateBusinessInfo" :loading="saving">Save Changes</el-button>
         </el-form-item>
       </el-form>
     </el-card>

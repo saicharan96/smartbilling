@@ -1,13 +1,8 @@
 <template>
   <div class="w-full">
-    <div class="mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Dashboard</h2>
-      <p class="text-sm text-gray-500 dark:text-gray-400">Last Updated: {{ lastUpdated }}</p>
-    </div>
-
     <!-- Stats Cards -->
     <div class="mb-6">
-      <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-5">Overview</h3>
+      <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 mb-5">Overview</h3>
       <dl class="dashboard-metrics grid grid-cols-1 divide-gray-200 dark:divide-gray-700 overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm md:grid-cols-4 md:divide-x md:divide-y-0">
         <div class="px-4 py-5 sm:p-6">
           <dt class="text-base font-normal text-gray-900 dark:text-gray-100">Today's Sales</dt>

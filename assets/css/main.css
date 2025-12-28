@@ -64,6 +64,7 @@ main, .main-content, .el-main {
   background: white !important;
   background-image: none !important;
   border-color: #e5e7eb !important;
+  border-radius: 12px !important;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -692,5 +693,86 @@ button, .btn-primary, .btn {
   .mobile-menu-toggle {
     display: none;
   }
+}
+
+/* Primary Button Color Override - #00ED64 */
+.el-button--primary {
+  background-color: #00ED64 !important;
+  border-color: #00ED64 !important;
+  color: #000000 !important;
+  border-radius: 8px !important;
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: #00c952 !important;
+  border-color: #00c952 !important;
+}
+
+.el-button--primary:active {
+  background-color: #00b045 !important;
+  border-color: #00b045 !important;
+}
+
+.el-button--primary.is-disabled,
+.el-button--primary.is-disabled:hover,
+.el-button--primary.is-disabled:focus {
+  background-color: #a0a0a0 !important;
+  border-color: #a0a0a0 !important;
+  color: #ffffff !important;
+}
+
+/* Element Plus primary color for other components */
+.el-upload--picture-card:hover,
+.el-upload:focus {
+  border-color: #00ED64 !important;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background-color: #00ED64 !important;
+  border-color: #00ED64 !important;
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: #00ED64 !important;
+  background: #00ED64 !important;
+}
+
+.el-switch.is-checked .el-switch__core {
+  background-color: #00ED64 !important;
+}
+
+.el-link--primary {
+  color: #00ED64 !important;
+}
+
+.el-link--primary:hover {
+  color: #00c952 !important;
+}
+
+/* Ensure all buttons are rounded */
+.el-button {
+  border-radius: 8px !important;
+}
+
+.el-button.is-circle {
+  border-radius: 50% !important;
+}
+
+.el-button.is-round {
+  border-radius: 20px !important;
+}
+
+/* Ensure danger buttons stay red for delete actions */
+.el-button--danger {
+  background-color: #f56565 !important;
+  border-color: #f56565 !important;
+  color: #ffffff !important;
+}
+
+.el-button--danger:hover,
+.el-button--danger:focus {
+  background-color: #e53e3e !important;
+  border-color: #e53e3e !important;
 }
 

@@ -2,96 +2,100 @@
   <div>
     <div class="page-header">
       <h2 class="page-title">Inventory</h2>
-      <el-button type="danger" @click="openDrawer(null)">
+      <el-button type="primary" @click="openDrawer(null)">
         <PlusIcon class="w-4 h-4 mr-1" />
         Add Product
       </el-button>
     </div>
 
-    <el-card shadow="never" class="bg-white">
-      <template #header>
-        <span class="text-lg font-semibold">Products</span>
+    <DataTable
+      :data="productsStore.products"
+      :columns="tableColumns"
+      :loading="productsStore.loading"
+      search-placeholder="Search products..."
+      empty-text="No products yet. Add your first product!"
+      :show-actions="true"
+      :show-index="true"
+      :page-size="20"
+    >
+      <template #image="{ row }">
+        <div class="table-image-container">
+          <img
+            v-if="row.imageUrl"
+            :src="row.imageUrl"
+            :alt="row.name"
+            class="table-product-image"
+          />
+          <div v-else class="table-image-placeholder">
+            <CubeIcon class="w-6 h-6" />
+          </div>
+        </div>
       </template>
 
-      <el-table 
-        v-loading="productsStore.loading"
-        :data="productsStore.products" 
-        style="width: 100%"
-        :empty-text="'No products yet. Add your first product!'"
-      >
-        <el-table-column prop="name" label="Name">
-          <template #default="{ row }">
-            <span class="cursor-pointer hover:text-primary" @click="openDrawer(row)">
-              {{ row.name }}
-            </span>
+      <template #name="{ row }">
+        <span class="cursor-pointer hover:text-primary" @click="openDrawer(row)">
+          {{ row.name }}
+        </span>
+      </template>
+
+      <template #price="{ row }">
+        {{ formatCurrency(row.price) }}
+      </template>
+
+      <template #costPrice="{ row }">
+        {{ formatCurrency(row.costPrice) }}
+      </template>
+
+      <template #status="{ row }">
+        <span 
+          v-if="row.quantity === 0"
+          class="inline-flex items-center gap-x-1.5 rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700"
+        >
+          <svg class="size-1.5 fill-red-500" viewBox="0 0 6 6" aria-hidden="true">
+            <circle cx="3" cy="3" r="3" />
+          </svg>
+          Out of Stock
+        </span>
+        <span 
+          v-else-if="row.quantity <= (row.lowStockThreshold ?? 10)"
+          class="inline-flex items-center gap-x-1.5 rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800"
+        >
+          <svg class="size-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
+            <circle cx="3" cy="3" r="3" />
+          </svg>
+          Low Stock
+        </span>
+        <span 
+          v-else
+          class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700"
+        >
+          <svg class="size-1.5 fill-green-500" viewBox="0 0 6 6" aria-hidden="true">
+            <circle cx="3" cy="3" r="3" />
+          </svg>
+          In Stock
+        </span>
+      </template>
+
+      <template #actions="{ row }">
+        <el-dropdown trigger="click" @command="handleCommand">
+          <el-button circle>
+            <el-icon><MoreFilled /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu class="w-56 divide-y divide-gray-100">
+              <el-dropdown-item :command="{ action: 'edit', row }" class="flex items-center px-4 py-2">
+                <PencilSquareIcon class="mr-3 h-5 w-5 text-gray-400" />
+                Edit
+              </el-dropdown-item>
+              <el-dropdown-item :command="{ action: 'delete', row }" divided class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50">
+                <TrashIcon class="mr-3 h-5 w-5 text-red-400" />
+                Delete
+              </el-dropdown-item>
+            </el-dropdown-menu>
           </template>
-        </el-table-column>
-        <el-table-column prop="code" label="Code" width="120" />
-        <el-table-column prop="price" label="Price" width="120">
-          <template #default="{ row }">
-            {{ formatCurrency(row.price) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="costPrice" label="Cost Price" width="120">
-          <template #default="{ row }">
-            {{ formatCurrency(row.costPrice) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="quantity" label="Quantity" width="100" />
-        <el-table-column label="Status" width="120">
-          <template #default="{ row }">
-            <span 
-              v-if="row.quantity === 0"
-              class="inline-flex items-center gap-x-1.5 rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-700"
-            >
-              <svg class="size-1.5 fill-red-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx="3" cy="3" r="3" />
-              </svg>
-              Out of Stock
-            </span>
-            <span 
-              v-else-if="row.quantity <= (row.lowStockThreshold ?? 10)"
-              class="inline-flex items-center gap-x-1.5 rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800"
-            >
-              <svg class="size-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx="3" cy="3" r="3" />
-              </svg>
-              Low Stock
-            </span>
-            <span 
-              v-else
-              class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700"
-            >
-              <svg class="size-1.5 fill-green-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx="3" cy="3" r="3" />
-              </svg>
-              In Stock
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Actions" width="80">
-          <template #default="{ row }">
-            <el-dropdown trigger="click" @command="handleCommand">
-              <el-button circle>
-                <el-icon><MoreFilled /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu class="w-56 divide-y divide-gray-100">
-                  <el-dropdown-item :command="{ action: 'edit', row }" class="flex items-center px-4 py-2">
-                    <PencilSquareIcon class="mr-3 h-5 w-5 text-gray-400" />
-                    Edit
-                  </el-dropdown-item>
-                  <el-dropdown-item :command="{ action: 'delete', row }" divided class="flex items-center px-4 py-2 text-red-700 hover:bg-red-50">
-                    <TrashIcon class="mr-3 h-5 w-5 text-red-400" />
-                    Delete
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+        </el-dropdown>
+      </template>
+    </DataTable>
 
     <!-- Product Drawer -->
     <el-drawer
@@ -107,6 +111,45 @@
         label-position="top"
         class="product-form"
       >
+        <el-form-item label="Product Image" prop="imageUrl">
+          <div class="product-image-upload">
+            <div v-if="productImagePreview || productForm.imageUrl" class="image-preview">
+              <img
+                :src="productImagePreview || productForm.imageUrl"
+                alt="Product preview"
+                class="preview-image"
+              />
+              <el-button
+                type="danger"
+                size="small"
+                circle
+                @click="removeProductImage"
+                class="remove-image-btn"
+              >
+                <el-icon><Delete /></el-icon>
+              </el-button>
+            </div>
+            <el-upload
+              v-else
+              :auto-upload="false"
+              :on-change="handleProductImageChange"
+              :show-file-list="false"
+              accept="image/*"
+              class="product-upload"
+            >
+              <el-button type="primary">
+                <el-icon class="mr-1"><Upload /></el-icon>
+                Upload Image
+              </el-button>
+            </el-upload>
+            <div v-if="productImageFile" class="mt-2">
+              <el-button type="primary" @click="uploadProductImage" :loading="uploadingImage" size="small">
+                {{ uploadingImage ? 'Uploading...' : 'Save Image' }}
+              </el-button>
+            </div>
+          </div>
+        </el-form-item>
+
         <el-form-item label="Product Name" prop="name">
           <el-input v-model="productForm.name" placeholder="Enter product name" />
         </el-form-item>
@@ -147,45 +190,6 @@
               </div>
             </el-option>
           </el-select>
-        </el-form-item>
-
-        <el-form-item label="Product Image" prop="imageUrl">
-          <div class="product-image-upload">
-            <div v-if="productImagePreview || productForm.imageUrl" class="image-preview">
-              <img
-                :src="productImagePreview || productForm.imageUrl"
-                alt="Product preview"
-                class="preview-image"
-              />
-              <el-button
-                type="danger"
-                size="small"
-                circle
-                @click="removeProductImage"
-                class="remove-image-btn"
-              >
-                <el-icon><Delete /></el-icon>
-              </el-button>
-            </div>
-            <el-upload
-              v-else
-              :auto-upload="false"
-              :on-change="handleProductImageChange"
-              :show-file-list="false"
-              accept="image/*"
-              class="product-upload"
-            >
-              <el-button type="primary">
-                <el-icon class="mr-1"><Upload /></el-icon>
-                Upload Image
-              </el-button>
-            </el-upload>
-            <div v-if="productImageFile" class="mt-2">
-              <el-button type="primary" @click="uploadProductImage" :loading="uploadingImage" size="small">
-                {{ uploadingImage ? 'Uploading...' : 'Save Image' }}
-              </el-button>
-            </div>
-          </div>
         </el-form-item>
 
         <el-form-item label="Description" prop="description">
@@ -266,7 +270,7 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon } from '@heroicons/vue/24/outline'
+import { PlusIcon, CubeIcon } from '@heroicons/vue/24/outline'
 import { PaperClipIcon as PinIcon } from '@heroicons/vue/24/solid'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/20/solid'
 import { MoreFilled, Upload, Delete } from '@element-plus/icons-vue'
@@ -287,6 +291,16 @@ const productFormRef = ref<FormInstance>()
 
 const productImageFile = ref<File | null>(null)
 const productImagePreview = ref<string | null>(null)
+
+const tableColumns = [
+  { prop: 'image', label: 'Image', width: 80, sortable: false },
+  { prop: 'name', label: 'Name', minWidth: 150, sortable: true, filterable: true },
+  { prop: 'code', label: 'Code', width: 120, sortable: true, filterable: true },
+  { prop: 'price', label: 'Price', width: 120, sortable: true },
+  { prop: 'costPrice', label: 'Cost Price', width: 120, sortable: true },
+  { prop: 'quantity', label: 'Quantity', width: 120, sortable: true },
+  { prop: 'status', label: 'Status', width: 120, sortable: false }
+]
 
 const productForm = ref({
   name: '',
@@ -529,11 +543,6 @@ const uploadProductImage = async () => {
       // ANY error (CORS, timeout, unauthorized, etc.) -> use base64
       console.log('Storage upload failed, using base64 fallback:', storageError)
       
-      ElMessage.info({
-        message: 'Using base64 encoding. To use Firebase Storage, enable it in Firebase Console.',
-        duration: 5000
-      })
-      
       // Always fallback to base64
       downloadURL = await convertToBase64(productImageFile.value)
     }
@@ -647,8 +656,8 @@ const formatCurrency = (amount: number) => {
 }
 
 .preview-image {
-  width: 200px;
-  height: 200px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -665,5 +674,43 @@ const formatCurrency = (amount: number) => {
   position: absolute;
   top: -8px;
   right: -8px;
+}
+
+.table-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+}
+
+.table-product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .table-product-image {
+  border-color: #334155;
+}
+
+.table-image-placeholder {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #9ca3af;
+}
+
+.dark .table-image-placeholder {
+  background: #1e293b;
+  border-color: #334155;
+  color: #64748b;
 }
 </style>

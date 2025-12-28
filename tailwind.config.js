@@ -12,9 +12,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#001f2a',
-        'primary-dark': '#001118',
-        'primary-light': '#003d4f',
+        primary: '#00ED64',
+        'primary-dark': '#00c952',
+        'primary-light': '#33f185',
       },
       fontFamily: {
         primary: ['Sora', 'sans-serif'],

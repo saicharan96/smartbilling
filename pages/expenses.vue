@@ -2,48 +2,39 @@
   <div>
     <div class="page-header">
       <h2 class="page-title">Expenses</h2>
-      <el-button type="danger" @click="showAddModal = true">
+      <el-button type="primary" @click="showAddModal = true">
         <PlusIcon class="w-4 h-4 mr-1" />
         Add Expense
       </el-button>
     </div>
 
-    <el-card shadow="never" class="bg-white">
-      <template #header>
-        <span class="text-lg font-semibold">Expense List</span>
+    <DataTable
+      :data="expensesStore.expenses"
+      :columns="tableColumns"
+      :loading="expensesStore.loading"
+      search-placeholder="Search expenses..."
+      empty-text="No expenses yet. Add your first expense!"
+      :show-actions="true"
+      :show-index="true"
+      :page-size="20"
+    >
+      <template #date="{ row }">
+        {{ formatDate(row.date) }}
       </template>
 
-      <el-table 
-        v-loading="expensesStore.loading"
-        :data="expensesStore.expenses" 
-        style="width: 100%"
-        :empty-text="'No expenses yet. Add your first expense!'"
-      >
-        <el-table-column prop="date" label="Date" width="120">
-          <template #default="{ row }">
-            {{ formatDate(row.date) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="category" label="Category" />
-        <el-table-column prop="description" label="Description" />
-        <el-table-column prop="amount" label="Amount" width="120">
-          <template #default="{ row }">
-            {{ formatCurrency(row.amount) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="paymentMethod" label="Payment Method" width="140" />
-        <el-table-column label="Actions" width="180">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" text @click="editExpense(row)">
-              Edit
-            </el-button>
-            <el-button type="danger" size="small" text @click="deleteExpense(row.id!)">
-              Delete
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+      <template #amount="{ row }">
+        {{ formatCurrency(row.amount) }}
+      </template>
+
+      <template #actions="{ row }">
+        <el-button type="primary" size="small" text @click="editExpense(row)">
+          Edit
+        </el-button>
+        <el-button type="danger" size="small" text @click="deleteExpense(row.id!)">
+          Delete
+        </el-button>
+      </template>
+    </DataTable>
   </div>
 </template>
 
@@ -54,6 +45,14 @@ import { ElMessageBox } from 'element-plus'
 
 const expensesStore = useExpensesStore()
 const showAddModal = ref(false)
+
+const tableColumns = [
+  { prop: 'date', label: 'Date', width: 120, sortable: true },
+  { prop: 'category', label: 'Category', minWidth: 120, sortable: true, filterable: true },
+  { prop: 'description', label: 'Description', minWidth: 200, sortable: true, filterable: true },
+  { prop: 'amount', label: 'Amount', width: 120, sortable: true },
+  { prop: 'paymentMethod', label: 'Payment Method', width: 140, sortable: true, filterable: true }
+]
 
 onMounted(async () => {
   await expensesStore.fetchExpenses()
